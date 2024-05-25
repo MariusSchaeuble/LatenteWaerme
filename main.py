@@ -13,6 +13,8 @@ from math import sqrt
 pi = math.pi
 
 
+matplotlib.rc('xtick', labelsize=20)
+matplotlib.rc('ytick', labelsize=20)
 
 
 def gauss(term):
@@ -52,7 +54,9 @@ def gauss(term):
 
 
 m_kalt_1 = 46.28/1000
+sigma_m_kalt_1 = 0.01/1000
 m_warm_1 = 57.10/1000
+sigma_m_warm_1 = 0.01/1000
 
 W_wasserwert_1 = matrix("""
 0    20.6;
@@ -72,10 +76,42 @@ W_wasserwert_1 = matrix("""
 """)# zeit in s, Temp. in gradC
 
 T_h_1 = 48.5
+sigma_T_h_1 = 0.5
+
+T_k_1 = 20.6
+sigma_T_k_1 = 0.1
+
+T_m_1 = 35
+sigma_T_m_1 = 0.5
+
+cw = 4.192*1000
+sigma_cw = 0
+
+K1 = cw*(m_warm_1*(T_h_1 - T_m_1)/(T_m_1 - T_k_1) - m_kalt_1)
+sigma_K1 = gauss("cw*(m_warm_1*(T_h_1 - T_m_1)/(T_m_1 - T_k_1) - m_kalt_1)")
+
+
+t = toArray(W_wasserwert_1[:, 0])
+sigma_t = 2*ones(len(t))
+
+T = toArray(W_wasserwert_1[:, 1])
+sigma_T = 0.5*ones(len(T))
+
+
+errorbar(t, T, sigma_T, sigma_t,'x', label='Temperaturmessung')
+xlabel('Zeit in s', fontsize=20)
+ylabel('Temperatur in °C', fontsize=20)
+legend(fontsize=15)
+grid()
+plt.tight_layout()
+savefig('wasserwert1')
+show()
 
 
 m_kalt_2 = 52.83/1000
 m_warm_2 = 54.61/1000
+sigma_m_kalt_2 = 0.01/1000
+sigma_m_warm_2 = 0.01/1000
 
 W_wasserwert_2 = matrix("""
 0    21.2;
@@ -100,11 +136,48 @@ W_wasserwert_2 = matrix("""
 
 
 T_h_2 = 47.7
+sigma_T_h_2 = 0.5
+
+T_k_2 = 21.4
+sigma_T_k_2 = 0.1
+
+T_m_2 = 33
+sigma_T_m_2 = 0.5
+
+cw = 4.192*1000
+sigma_cw = 0
+
+K2 = cw*(m_warm_2*(T_h_2 - T_m_2)/(T_m_2 - T_k_2) - m_kalt_2)
+sigma_K2 = gauss("cw*(m_warm_2*(T_h_2 - T_m_2)/(T_m_2 - T_k_2) - m_kalt_2)")
+
+
+t = toArray(W_wasserwert_2[:, 0])
+sigma_t = 2*ones(len(t))
+
+T = toArray(W_wasserwert_2[:, 1])
+sigma_T = 0.5*ones(len(T))
+
+
+errorbar(t, T, sigma_T, sigma_t,'x', label='Temperaturmessung')
+xlabel('Zeit in s', fontsize=20)
+ylabel('Temperatur in °C', fontsize=20)
+legend(fontsize=15)
+grid()
+plt.tight_layout()
+savefig('wasserwert2')
+show()
+
+
+K = (K1 + K2)/2
+sigma_K = gauss("(K1 + K2)/2")
 
 
 #2 eis
 m_warm_1 = 66.86/1000
+sigma_m_warm_1 = 0.01/1000
 m_eis_1 = 17.63/1000
+sigma_m_eis_1 = 0.01/1000
+
 W_eis_1 = matrix("""
 0    46.1;
 30   45.9;
@@ -130,10 +203,46 @@ W_eis_1 = matrix("""
 490  24.7
 """)
 
+def linear(x, a, b):
+    return a*x + b
+
+
+t = toArray(W_eis_1[:, 0])
+sigma_t = 2*ones(len(t))
+
+T = toArray(W_eis_1[:, 1])
+sigma_T = 0.5*ones(len(T))
+
+errorbar(t, T, sigma_T, sigma_t,'x', label='Temperaturmessung')
+plot(t[8:11], T[8:11])
+optimizedParameters1, s = opt.curve_fit(linear, t[0:8], T[0:8])
+plot(t[0:17], linear(t[0:17], *optimizedParameters1), label="fit1")
+optimizedParameters2, s = opt.curve_fit(linear, t[10:], T[10:])
+plot(t[4:], linear(t[4:], *optimizedParameters2), label="fit1")
+t_zwickel = 248
+plt.vlines(t_zwickel, min(T), max(T), label='vline')
+xlabel('Zeit in s', fontsize=20)
+ylabel('Temperatur in °C', fontsize=20)
+legend(fontsize=15)
+grid()
+plt.tight_layout()
+savefig('eis1')
+show()
+
+T_h_eis_1 = linear(t_zwickel, *optimizedParameters1)
+sigma_T_h_eis_1 = 0.1
+sigma_T_k_eis_1 = 0.1
+T_k_eis_1 = linear(t_zwickel, *optimizedParameters2)
+
+schmelz_1 = ((T_h_eis_1 - T_k_eis_1)*(cw*m_warm_1 + K) - cw*m_eis_1*T_k_eis_1)/m_eis_1
+sigma_schmelz_1 = gauss("((T_h_eis_1 - T_k_eis_1)*(cw*m_warm_1 + K) - cw*m_eis_1*T_k_eis_1)/m_eis_1")
+
 
 
 m_warm_2 = 65.36/1000
+sigma_m_warm_2 = 0.01/1000
 m_eis_2 = 27.27/1000
+sigma_m_eis_2 = 0.01/1000
 W_eis_2 = matrix("""
 0    49;
 30   48.9;
@@ -158,10 +267,47 @@ W_eis_2 = matrix("""
 460  17;
 490  17.1
 """)
+
+
+t = toArray(W_eis_2[:, 0])
+sigma_t = 2*ones(len(t))
+
+T = toArray(W_eis_2[:, 1])
+sigma_T = 0.5*ones(len(T))
+
+errorbar(t, T, sigma_T, sigma_t,'x', label='Temperaturmessung')
+plot(t[8:11], T[8:11])
+optimizedParameters1, s = opt.curve_fit(linear, t[0:8], T[0:8])
+plot(t[0:17], linear(t[0:17], *optimizedParameters1), label="fit1")
+optimizedParameters2, s = opt.curve_fit(linear, t[10:], T[10:])
+plot(t[4:], linear(t[4:], *optimizedParameters2), label="fit1")
+t_zwickel = 248
+plt.vlines(t_zwickel, min(T), max(T), label='vline')
+xlabel('Zeit in s', fontsize=20)
+ylabel('Temperatur in °C', fontsize=20)
+legend(fontsize=15)
+grid()
+plt.tight_layout()
+savefig('eis2')
+show()
+
+
+T_h_eis_2 = linear(t_zwickel, *optimizedParameters1)
+sigma_T_h_eis_2 = 0.1
+sigma_T_k_eis_2 = 0.1
+T_k_eis_2 = linear(t_zwickel, *optimizedParameters2)
+
+schmelz_2 = ((T_h_eis_2 - T_k_eis_2)*(cw*m_warm_2 + K) - cw*m_eis_2*T_k_eis_2)/m_eis_2
+sigma_schmelz_2 = gauss("((T_h_eis_2 - T_k_eis_2)*(cw*m_warm_2 + K) - cw*m_eis_2*T_k_eis_2)/m_eis_2")
+
+
+
 #3.1 kondensationsmethode
 
 m_davor_1 = 103.15/1000
+sigma_m_davor_1 = 0.01/1000
 m_danach_1 = 107.61/1000
+sigma_m_danach_1 = 0.01/1000
 W_kondens_1 =matrix("""
 0   20.6;
 30  20.6;
@@ -176,13 +322,50 @@ W_kondens_1 =matrix("""
 140 43.0;
 150 45.0;
 180 44.0;
-210 34.9;
-240 34.7;
-270 34.5;
+210 43.9;
+240 43.7;
+270 43.5
 """)
 
+
+
+
+t = toArray(W_kondens_1[:, 0])
+sigma_t = 2*ones(len(t))
+
+T = toArray(W_kondens_1[:, 1])
+sigma_T = 0.5*ones(len(T))
+
+errorbar(t, T, sigma_T, sigma_t,'x', label='Temperaturmessung')
+plot(t[1:12], T[1:12])
+optimizedParameters1, s = opt.curve_fit(linear, t[0:2], T[0:2])
+plot(t[0:17], linear(t[0:17], *optimizedParameters1), label="fit1")
+optimizedParameters2, s = opt.curve_fit(linear, t[11:], T[11:])
+plot(t[2:], linear(t[2:], *optimizedParameters2), label="fit1")
+t_zwickel = 100
+plt.vlines(t_zwickel, min(T), max(T), label='vline')
+xlabel('Zeit in s', fontsize=20)
+ylabel('Temperatur in °C', fontsize=20)
+legend(fontsize=15, fancybox=True, framealpha=0.5)
+grid()
+plt.tight_layout()
+savefig('kondens1')
+show()
+
+
+T_h_kondens_1 = linear(t_zwickel, *optimizedParameters2)
+sigma_T_h_kondens_1 = 0.1
+sigma_T_k_kondens_1 = 0.1
+T_k_kondens_1 = linear(t_zwickel, *optimizedParameters1)
+
+kondens1 = ((T_h_kondens_1 - T_k_kondens_1)*(K + cw*m_davor_1) - (98 - T_h_kondens_1)*(m_danach_1 - m_davor_1))/(m_danach_1 - m_davor_1)
+sigma_kondens1 = gauss("((T_h_kondens_1 - T_k_kondens_1)*(K + cw*m_davor_1) - (98 - T_h_kondens_1)*(m_danach_1 - m_davor_1))/(m_danach_1 - m_davor_1)")
+
+
 m_davor_2 = 94.52/1000
+sigma_m_davor_2 = 0.01/1000
 m_danach_2 = 98.61/1000
+sigma_m_danach_2 = 0.01/1000
 W_kondens_2 =matrix("""
 0   21.8;
 30  22;
@@ -203,28 +386,87 @@ W_kondens_2 =matrix("""
 280 48.2
 """)
 
+t = toArray(W_kondens_2[:, 0])
+sigma_t = 2*ones(len(t))
+
+T = toArray(W_kondens_2[:, 1])
+sigma_T = 0.5*ones(len(T))
+
+errorbar(t, T, sigma_T, sigma_t,'x', label='Temperaturmessung')
+plot(t[2:14], T[2:14])
+optimizedParameters1, s = opt.curve_fit(linear, t[0:3], T[0:3])
+plot(t[0:17], linear(t[0:17], *optimizedParameters1), label="fit1")
+optimizedParameters2, s = opt.curve_fit(linear, t[15:], T[15:])
+plot(t[2:], linear(t[2:], *optimizedParameters2), label="fit1")
+t_zwickel = 135
+plt.vlines(t_zwickel, min(T), max(T), label='vline')
+xlabel('Zeit in s', fontsize=20)
+ylabel('Temperatur in °C', fontsize=20)
+legend(fontsize=15, fancybox=True, framealpha=0.5)
+grid()
+plt.tight_layout()
+savefig('kondens2')
+show()
+
+
+T_h_kondens_2 = linear(t_zwickel, *optimizedParameters2)
+sigma_T_h_kondens_2 = 0.1
+sigma_T_k_kondens_2 = 0.1
+T_k_kondens_2 = linear(t_zwickel, *optimizedParameters1)
+
+kondens2 = ((T_h_kondens_2 - T_k_kondens_2)*(K + cw*m_davor_2) - (98 - T_h_kondens_2)*(m_danach_2 - m_davor_2))/(m_danach_2 - m_davor_2)
+sigma_kondens2 = gauss("((T_h_kondens_2 - T_k_kondens_2)*(K + cw*m_davor_2) - (98 - T_h_kondens_2)*(m_danach_2 - m_davor_2))/(m_danach_2 - m_davor_2)")
+
+
+
+
 #3.2 verdampfungsmethode
 
 
 #1. durchgang
 
-U1 = 94
-I1 = 2
-m1 = 18.68/1000
+U = 94
+II = 2
+m = 18.68/1000
+
+t = 4*60
+sigma_t = 3
+sigma_U = 2
+sigma_II = 0.02
+sigma_m = 0.01
+
+verdampf1 = U*II*t/m
+sigma_verdampf1 = gauss("U*II*t/m")
 
 #2. durchgang
 
-U2 = 84
-I2 = 1.8
-m2 = 15.03/1000
+U = 84
+II = 1.8
+m = 15.03/1000
+
+verdampf2 = U*II*t/m
+sigma_verdampf2 = gauss("U*II*t/m")
 
 #3. durchgang
 
-U3 = 70
-I3 = 1.5
-m3 = 10.62/1000
+U = 70
+II = 1.5
+m = 10.62/1000
 
+
+verdampf3 = U*II*t/m
+sigma_verdampf3 = gauss("U*II*t/m")
 # 4 minuten
 
 #946 hPa druck
 #push
+
+#drucken
+latexTable(UC(W_wasserwert_1[:, 0], 's'), UC(W_wasserwert_1[:, 1], '^\\circ C'))
+latexTable(UC(W_wasserwert_2[:, 0], 's'), UC(W_wasserwert_2[:, 1], '^\\circ C'))
+
+latexTable(UC(W_eis_1[:, 0], 's'), UC(W_eis_1[:, 1], '^\\circ C'))
+latexTable(UC(W_eis_2[:, 0], 's'), UC(W_eis_2[:, 1], '^\\circ C'))
+
+latexTable(UC(W_kondens_1[:, 0], 's'), UC(W_kondens_1[:, 1], '^\\circ C'))
+latexTable(UC(W_kondens_2[:, 0], 's'), UC(W_kondens_2[:, 1], '^\\circ C'))
