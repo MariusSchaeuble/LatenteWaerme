@@ -223,7 +223,7 @@ t_zwickel = 248
 plt.vlines(t_zwickel, min(T), max(T), label='vline')
 xlabel('Zeit in s', fontsize=20)
 ylabel('Temperatur in °C', fontsize=20)
-legend(fontsize=15)
+legend(fontsize=13, loc='center left')
 grid()
 plt.tight_layout()
 savefig('eis1')
@@ -285,7 +285,7 @@ t_zwickel = 248
 plt.vlines(t_zwickel, min(T), max(T), label='vline')
 xlabel('Zeit in s', fontsize=20)
 ylabel('Temperatur in °C', fontsize=20)
-legend(fontsize=15)
+legend(fontsize=13, loc='center left')
 grid()
 plt.tight_layout()
 savefig('eis2')
@@ -358,8 +358,11 @@ sigma_T_h_kondens_1 = 0.1
 sigma_T_k_kondens_1 = 0.1
 T_k_kondens_1 = linear(t_zwickel, *optimizedParameters1)
 
-kondens1 = ((T_h_kondens_1 - T_k_kondens_1)*(K + cw*m_davor_1) - (98 - T_h_kondens_1)*(m_danach_1 - m_davor_1))/(m_danach_1 - m_davor_1)
-sigma_kondens1 = gauss("((T_h_kondens_1 - T_k_kondens_1)*(K + cw*m_davor_1) - (98 - T_h_kondens_1)*(m_danach_1 - m_davor_1))/(m_danach_1 - m_davor_1)")
+T0 = 98
+sigma_T0 = 1
+
+kondens1 = ((T_h_kondens_1 - T_k_kondens_1)*(K + cw*m_davor_1) - (T0 - T_h_kondens_1)*(m_danach_1 - m_davor_1))/(m_danach_1 - m_davor_1)
+sigma_kondens1 = gauss("((T_h_kondens_1 - T_k_kondens_1)*(K + cw*m_davor_1) - (T0 - T_h_kondens_1)*(m_danach_1 - m_davor_1))/(m_danach_1 - m_davor_1)")
 
 
 m_davor_2 = 94.52/1000
@@ -402,7 +405,7 @@ t_zwickel = 135
 plt.vlines(t_zwickel, min(T), max(T), label='vline')
 xlabel('Zeit in s', fontsize=20)
 ylabel('Temperatur in °C', fontsize=20)
-legend(fontsize=15, fancybox=True, framealpha=0.5)
+legend(fontsize=13, fancybox=True, framealpha=0.5, loc='upper left')
 grid()
 plt.tight_layout()
 savefig('kondens2')
@@ -415,7 +418,7 @@ sigma_T_k_kondens_2 = 0.1
 T_k_kondens_2 = linear(t_zwickel, *optimizedParameters1)
 
 kondens2 = ((T_h_kondens_2 - T_k_kondens_2)*(K + cw*m_davor_2) - (98 - T_h_kondens_2)*(m_danach_2 - m_davor_2))/(m_danach_2 - m_davor_2)
-sigma_kondens2 = gauss("((T_h_kondens_2 - T_k_kondens_2)*(K + cw*m_davor_2) - (98 - T_h_kondens_2)*(m_danach_2 - m_davor_2))/(m_danach_2 - m_davor_2)")
+sigma_kondens2 = gauss("((T_h_kondens_2 - T_k_kondens_2)*(K + cw*m_davor_2) - (T0 - T_h_kondens_2)*(m_danach_2 - m_davor_2))/(m_danach_2 - m_davor_2)")
 
 
 
