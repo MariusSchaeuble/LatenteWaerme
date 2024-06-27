@@ -361,8 +361,8 @@ T_k_kondens_1 = linear(t_zwickel, *optimizedParameters1)
 T0 = 98
 sigma_T0 = 1
 
-kondens1 = ((T_h_kondens_1 - T_k_kondens_1)*(K + cw*m_davor_1) - (T0 - T_h_kondens_1)*(m_danach_1 - m_davor_1))/(m_danach_1 - m_davor_1)
-sigma_kondens1 = gauss("((T_h_kondens_1 - T_k_kondens_1)*(K + cw*m_davor_1) - (T0 - T_h_kondens_1)*(m_danach_1 - m_davor_1))/(m_danach_1 - m_davor_1)")
+kondens1 = ((T_h_kondens_1 - T_k_kondens_1)*(K + cw*m_davor_1) - (T0 - T_h_kondens_1)*cw*(m_danach_1 - m_davor_1))/(m_danach_1 - m_davor_1)
+sigma_kondens1 = gauss("((T_h_kondens_1 - T_k_kondens_1)*(K + cw*m_davor_1) - (T0 - T_h_kondens_1)*cw*(m_danach_1 - m_davor_1))/(m_danach_1 - m_davor_1)")
 
 
 m_davor_2 = 94.52/1000
@@ -417,8 +417,8 @@ sigma_T_h_kondens_2 = 0.1
 sigma_T_k_kondens_2 = 0.1
 T_k_kondens_2 = linear(t_zwickel, *optimizedParameters1)
 
-kondens2 = ((T_h_kondens_2 - T_k_kondens_2)*(K + cw*m_davor_2) - (98 - T_h_kondens_2)*(m_danach_2 - m_davor_2))/(m_danach_2 - m_davor_2)
-sigma_kondens2 = gauss("((T_h_kondens_2 - T_k_kondens_2)*(K + cw*m_davor_2) - (T0 - T_h_kondens_2)*(m_danach_2 - m_davor_2))/(m_danach_2 - m_davor_2)")
+kondens2 = ((T_h_kondens_2 - T_k_kondens_2)*(K + cw*m_davor_2) - (98 - T_h_kondens_2)*cw*(m_danach_2 - m_davor_2))/(m_danach_2 - m_davor_2)
+sigma_kondens2 = gauss("((T_h_kondens_2 - T_k_kondens_2)*(K + cw*m_davor_2) - (T0 - T_h_kondens_2)*cw*(m_danach_2 - m_davor_2))/(m_danach_2 - m_davor_2)")
 
 
 
@@ -436,7 +436,7 @@ t = 4*60
 sigma_t = 3
 sigma_U = 2
 sigma_II = 0.02
-sigma_m = 0.01
+sigma_m = 0.01/1000
 
 verdampf1 = U*II*t/m
 sigma_verdampf1 = gauss("U*II*t/m")
